@@ -1,0 +1,22 @@
+#ttt_table {
+  margin: auto;
+  .border_bottom {
+    border-bottom: 1px solid black;
+  }
+  .border_right {
+    border-right: 1px solid black;
+  }
+  td {
+    // border: 1px solid black;
+    width: 150px;
+    height: 150px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 70px;
+  }
+}
+.restart_btn {
+  height: 50px;
+  width: 100px;
+  cursor: pointer;
+}
