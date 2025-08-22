@@ -2,8 +2,13 @@ import Count_text from './components/count_text'
 import Weather from './components/weather'
 import TodoList from './components/todolist'
 import Tic_Tac_Toe from './components/tic_tac_toe'
+import Color_game from './components/color_game'
+import Leetcode from './components/leetcode_page'
+
+
 // import { Provider } from 'react-redux'
 import { createContext } from "react";
+export const AllData = createContext(null)
 
 import './all.scss'
 import {
@@ -15,7 +20,6 @@ import { useState } from 'react'
 
 function App() {
   const [nowShow, setNowShow] = useState("綜合頁面")
-  const AllData = createContext(null)
   function Home() {
     return (
       <>
@@ -56,6 +60,12 @@ function App() {
             <Link to='/tic_tac_toe'>Tic-Tac-Toe</Link>
           </li>
           <li style={{ paddingBottom: "10px" }}>
+            <Link to='/color_game'>Color Game</Link>
+          </li>
+          <li style={{ paddingBottom: "10px" }}>
+            <Link to='/leetcode_page'>Leetcode</Link>
+          </li>
+          <li style={{ paddingBottom: "10px" }}>
             <Link to='/'>回到首頁</Link>
           </li>
 
@@ -69,11 +79,11 @@ function App() {
               <Route path='weather' element={<Weather />} />
               <Route path='todolist' element={<TodoList />} />
               <Route path='tic_tac_toe' element={<Tic_Tac_Toe />} />
+              <Route path='color_game' element={<Color_game />} />
+              <Route path='leetcode_page' element={<Leetcode />} />
 
               <Route path='*' element={<Home />} />
-
             </Routes>
-
             {/* <Count_text /> */}
           </div>
 
