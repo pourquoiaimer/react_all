@@ -4,6 +4,7 @@ import TodoList from './components/todolist'
 import Tic_Tac_Toe from './components/tic_tac_toe'
 import Color_game from './components/color_game'
 import Leetcode from './components/leetcode_page'
+import Sort_build from './components/sort_build'
 
 
 // import { Provider } from 'react-redux'
@@ -66,6 +67,9 @@ function App() {
             <Link to='/leetcode_page'>Leetcode</Link>
           </li>
           <li style={{ paddingBottom: "10px" }}>
+            <Link to='/sort_build'>Sort Build</Link>
+          </li>
+          <li style={{ paddingBottom: "10px" }}>
             <Link to='/'>回到首頁</Link>
           </li>
 
@@ -81,6 +85,7 @@ function App() {
               <Route path='tic_tac_toe' element={<Tic_Tac_Toe />} />
               <Route path='color_game' element={<Color_game />} />
               <Route path='leetcode_page' element={<Leetcode />} />
+              <Route path='sort_build' element={<Sort_build />} />
 
               <Route path='*' element={<Home />} />
             </Routes>

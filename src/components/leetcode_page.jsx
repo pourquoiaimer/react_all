@@ -3,56 +3,59 @@ import { useState, useEffect } from "react";
 const Leetcode = () => {
     const [ans, setAns] = useState("")
     const [test_case, setTest_case] = useState("")
+    const [test_case_] = useState([["aab", "c*a*b"], ["aa", "a*"], ["ab", ".*"]])
 
-    //位數法，1位與最大的比，2位與次大的比x跟總位數-x+1---算法部份可以是兩個數字都/x或者位數-x後無條件捨去取整
-
-
-    function isPalindrome(x) {
-        if(typeof x != "number"){
+    function testFn(s, p) {
+        if (s == p) { return true }
+        // if (p.length > s.length) { return false }
+        if (p.startsWith("*")) {
             return false
         }
+        let ans = true
+        let arr_s = s.split("")
+        let arr_p = p.split("")
+        let now_p = 0
+        for (let i = 0; i < arr_s.length; i++) {
+            if(now_p>=arr_p.length){
+                ans = false
+                break
+            }
+            if (arr_s[i] == arr_p[now_p]) {
+                now_p++
+                console.log(1);
+                
+                continue
+            }
+            if (arr_p[now_p] == ".") {
+                now_p++
+                console.log(2);
 
-        if (x < 0) { return false }
-        if (x < 10) { return true }
+                continue
+            }
+            //上面已經排除字母一樣跟字母對應.了，後面直接對應的是字母不同且不為點的狀況，基本上就只有*
+            if (arr_p[now_p-1] == "."||arr_p[now_p-1] ==arr_s[i]) {//這兩種是前一個正確延續的狀態，選擇不前進---但須要解決下一個不合的問題
+                console.log(3);
+                continue
+            }
+            if(arr_p[now_p]=="*"&&arr_p[now_p+1]==arr_s[i]){
+                now_p+=2
+                console.log(4);
 
-        // let arr = []
-        let num_digits = 1 //位數
-        let num = x
-
-        while (num / 10 > 1) {
-            console.log(1);
-
-            num = num / 10
-            num_digits++
+                continue
+            }
+            console.log('1');
+            
+            ans = false
         }
-        //num_digits會是總位數，現在知道位數了
-        let palindrome = 0
-        let num_ori = x
-
-        for (let index = num_digits; index < 2; index - 1) {
-            console.log(12);
-
-            // palindrome += Math.floor(num_ori / 10 ** index - 1)
-            console.log(Math.floor(num_ori / 10 ** index - 1));
-
-        }
 
 
-        // let arr = []
-        // for (let i = 0; i < num_digits; i++) {
-        //     arr.push(Math.floor(x / Math.pow(10, i)) % 10)
-        // }
-        // console.log(arr);
-        return true
-
-        if (num_digits == 1) { return true }
-        // return true
+        return ans
     }
 
 
     useEffect(() => {
         if (test_case != "") {
-            setAns(isPalindrome(test_case))
+            setAns(testFn(test_case))
         }
 
     }, [test_case])
@@ -64,7 +67,24 @@ const Leetcode = () => {
     return (
         <div>
             <h3>test case</h3>
+            {
+                test_case_.map((item, index) => {
+                    return (<>
+
+                        <div key={index}>
+                            <span>{item[0]},</span>
+                            <span style={{ "marginRight": "30px" }}>{item[1]} </span>
+                            <span > {testFn(item[0], item[1]) ? "true" : "false"}</span>
+                        </div>
+                    </>
+                    )
+                })
+            }
+            <br />
             <input type="text" id="test_case" onBlur={(e) => setTest_case(e.target.value)}></input>
+
+
+
             <h3>ans</h3>
 
             <span>{ans ? "true" : "false"}</span>
