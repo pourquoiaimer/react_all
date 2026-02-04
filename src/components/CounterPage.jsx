@@ -1,46 +1,29 @@
-import { useState, useContext, useEffect } from 'react';
-// import { AllData } from '../App';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 const CounterPage = () => {
-    // const { setNowShow } = useContext(AllData);
     const [ptLevel, setPtLevel] = useState(1);
-
-    // useEffect(() => {
-    //     setNowShow("卡厄斯夢境 PT 計算機 (3人版)");
-    // }, [setNowShow]);
-
-    // Calculate PT Limit based on level
-    // Level 1 = 30, Level 2 = 40, etc. => 30 + (Level - 1) * 10
     const ptLimit = Math.max(0, 30 + (Math.max(1, ptLevel) - 1) * 10);
 
     return (
-        <div style={{ padding: '10px', fontFamily: 'Arial, sans-serif', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            {/* Top Bar: PT Limit Input */}
-            <div style={{ marginBottom: '10px', padding: '10px', background: '#e3f2fd', borderRadius: '5px', display: 'flex', alignItems: 'center', gap: '20px', flexShrink: 0 }}>
+        <div style={{ padding: '10px', fontFamily: 'Arial, sans-serif', backgroundColor: '#f4f7f9', minHeight: '100vh' }}>
+            {/* 頂部 PT 等級設定 */}
+            <div style={{ marginBottom: '15px', padding: '15px', background: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)', borderRadius: '8px', color: 'white', display: 'flex', alignItems: 'center', gap: '20px', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <label style={{ fontWeight: 'bold' }}>PT 等級 (1-15):</label>
+                    <label style={{ fontWeight: 'bold' }}>PT 等級 (1-16):</label>
                     <input 
-                        type="number" 
-                        min="1" 
-                        max="15" 
+                        type="number" min="1" max="15" 
                         value={ptLevel} 
-                        onChange={(e) => {
-                            let val = parseInt(e.target.value);
-                            if (val > 15) val = 15;
-                            if (val < 1) val = 1;
-                            setPtLevel(val);
-                        }}
-                        style={{ width: '60px', padding: '5px', borderRadius: '4px', border: '1px solid #ccc' }}
+                        onChange={(e) => setPtLevel(Math.min(16, Math.max(1, parseInt(e.target.value) || 1)))}
+                        style={{ width: '55px', padding: '5px', borderRadius: '4px', border: 'none', textAlign: 'center' }}
                     />
                 </div>
-                <div style={{ fontWeight: 'bold', color: '#1565c0' }}>
-                    本次 PT 上限: <span style={{ fontSize: '1.2em' }}>{ptLimit}</span>
+                <div style={{ fontSize: '1.1em', fontWeight: 'bold' }}>
+                    存檔點數上限: <span style={{ fontSize: '1.3em', color: '#fff176' }}>{ptLimit}</span>
                 </div>
             </div>
 
-            {/* 3 Columns Container */}
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'space-between', flexGrow: 1, overflowX: 'auto' }}>
+            <div style={{ display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '10px' }}>
                 <CharacterColumn name="角色 1" ptLimit={ptLimit} />
                 <CharacterColumn name="角色 2" ptLimit={ptLimit} />
                 <CharacterColumn name="角色 3" ptLimit={ptLimit} />
@@ -50,204 +33,89 @@ const CounterPage = () => {
 };
 
 const CharacterColumn = ({ name, ptLimit }) => {
-    // 狀態設定
-    const [deleteCount, setDeleteCount] = useState(0);
-    const [charDeleteCount, setCharDeleteCount] = useState(0);
-    const [copyCount, setCopyCount] = useState(0);
-    const [transformCount, setTransformCount] = useState(0);
-    const [neutralTabooCount, setNeutralTabooCount] = useState(0);
-    const [monsterCount, setMonsterCount] = useState(0);
-    const [godFlashCount, setGodFlashCount] = useState(0);
-    const [inspirationFlashCount, setInspirationFlashCount] = useState(0);
+    // 狀態管理
+    const [delStartCard, setDelStartCard] = useState(0); // 移除/轉換起始卡 (max 4, 20pt)
+    const [delOtherRecord, setDelOtherRecord] = useState(0); // 其他移除/轉換紀錄 (0pt)
+    const [copyCount, setCopyCount] = useState(0); // 複製 (max 4, 3-4次 40pt)
+    const [neutralTaboo, setNeutralTaboo] = useState(0);
+    const [mNormal, setMNormal] = useState(0);
+    const [mRare, setMRare] = useState(0);
+    const [mLegend, setMLegend] = useState(0);
+    const [godFlash, setGodFlash] = useState(0);
+    const [equipEffect, setEquipEffect] = useState(0);
 
-    // 成本計算邏輯
-    const progressiveCosts = [0, 10, 30, 50, 70]; // 1st to 5th
+    // 計算總分
+    const deletePT = delStartCard * 20;
+    const copyPT = copyCount > 2 ? (copyCount - 2) * 40 : 0;
+    const monsterPT = (mNormal * 20) + (mRare * 50) + (mLegend * 80);
+    const totalPT = deletePT + copyPT + (neutralTaboo * 20) + monsterPT + (godFlash * 20) + (equipEffect * 10);
 
-    const calculateProgressiveCost = (count) => {
-        let total = 0;
-        for (let i = 0; i < count; i++) {
-            if (i < progressiveCosts.length) {
-                total += progressiveCosts[i];
-            } else {
-                total += 70;
-            }
-        }
-        return total;
-    };
+    const isOver = totalPT > ptLimit;
+    const totalDelRecords = delStartCard + delOtherRecord;
 
-    const deleteBaseCost = calculateProgressiveCost(deleteCount);
-    const charDeleteExtraCost = charDeleteCount * 20;
-    const totalDeleteCost = deleteBaseCost + charDeleteExtraCost;
-
-    const copyCost = calculateProgressiveCost(copyCount);
-    const transformCost = transformCount * 10;
-    const neutralTabooCost = neutralTabooCount * 20;
-    const monsterCost = monsterCount * 80;
-    const godFlashCost = godFlashCount * 20;
-    const inspirationFlashCost = inspirationFlashCount * 10; // Updated to 10 PT
-
-    const totalPT = totalDeleteCost + copyCost + transformCost + neutralTabooCost + monsterCost + godFlashCost + inspirationFlashCost;
-
-    const isOverLimit = totalPT > ptLimit;
-
-    // 確保角色刪除次數不超過總刪除次數
-    useEffect(() => {
-        if (charDeleteCount > deleteCount) {
-            setCharDeleteCount(deleteCount);
-        }
-    }, [deleteCount, charDeleteCount]);
-
-    const handleReset = () => {
-        if (window.confirm(`確定要重置 ${name} 的數值嗎？`)) {
-            setDeleteCount(0);
-            setCharDeleteCount(0);
-            setCopyCount(0);
-            setTransformCount(0);
-            setNeutralTabooCount(0);
-            setMonsterCount(0);
-            setGodFlashCount(0);
-            setInspirationFlashCount(0);
+    const reset = () => {
+        if(window.confirm(`重置 ${name} 的數據嗎？`)) {
+            setDelStartCard(0); setDelOtherRecord(0); setCopyCount(0); setNeutralTaboo(0);
+            setMNormal(0); setMRare(0); setMLegend(0); setGodFlash(0); setEquipEffect(0);
         }
     };
 
     return (
-        <div style={{ 
-            flex: 1, 
-            minWidth: '250px',
-            background: 'white', 
-            borderRadius: '8px', 
-            boxShadow: '0 2px 5px rgba(0,0,0,0.1)', 
-            display: 'flex', 
-            flexDirection: 'column',
-            border: isOverLimit ? '2px solid #f44336' : '1px solid #ddd'
-        }}>
-            <div style={{ 
-                padding: '10px', 
-                background: isOverLimit ? '#ffebee' : '#f5f5f5', 
-                fontWeight: 'bold', 
-                borderBottom: '1px solid #ddd',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                borderTopLeftRadius: '8px',
-                borderTopRightRadius: '8px'
-            }}>
-                <span>{name}</span>
-                <button onClick={handleReset} style={{ fontSize: '0.8em', padding: '2px 8px', cursor: 'pointer' }}>重置</button>
+        <div style={{ flex: '1 0 280px', background: 'white', borderRadius: '10px', display: 'flex', flexDirection: 'column', border: isOver ? '2px solid #f44336' : '1px solid #ddd', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+            <div style={{ padding: '12px', background: isOver ? '#ffebee' : '#f8f9fa', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}>
+                <strong style={{ color: isOver ? '#d32f2f' : '#333' }}>{name}</strong>
+                <button onClick={reset} style={{ padding: '2px 8px', cursor: 'pointer', fontSize: '0.8em', borderRadius: '4px', border: '1px solid #ccc' }}>重置</button>
             </div>
 
-            <div style={{ padding: '0 10px', flexGrow: 1, overflowY: 'auto' }}>
-                <SectionTitle title="操作成本" />
-                <CounterRow title="刪除卡牌" count={deleteCount} setCount={setDeleteCount} subtotal={deleteBaseCost} />
-                <CounterRow title="└ 含角色卡" count={charDeleteCount} setCount={setCharDeleteCount} subtotal={charDeleteExtraCost} max={deleteCount} isSubItem />
-                <CounterRow title="複製卡牌" count={copyCount} setCount={setCopyCount} subtotal={copyCost} />
-                <CounterRow title="轉換卡牌" count={transformCount} setCount={setTransformCount} subtotal={transformCost} />
+            <div style={{ padding: '10px', flex: 1 }}>
+                <SectionLabel title={`移除與複製 (紀錄: ${totalDelRecords}/5)`} />
+                <CounterItem title="移除/轉換起始卡 (20pt)" val={delStartCard} set={setDelStartCard} max={4} sub={deletePT} />
+                <CounterItem title="其他移除/轉換 (0pt)" val={delOtherRecord} set={setDelOtherRecord} max={5 - delStartCard} sub={0} color="#9e9e9e" />
+                <CounterItem title="複製次數 (3-4張計費)" val={copyCount} set={setCopyCount} max={4} sub={copyPT} />
 
-                <SectionTitle title="持有成本" />
-                <CounterRow title="中立/禁忌" count={neutralTabooCount} setCount={setNeutralTabooCount} subtotal={neutralTabooCost} />
-                <CounterRow title="怪物卡" count={monsterCount} setCount={setMonsterCount} subtotal={monsterCost} />
-                <CounterRow title="神之一閃" count={godFlashCount} setCount={setGodFlashCount} subtotal={godFlashCost} />
-                <CounterRow title="中立卡靈光一閃" count={inspirationFlashCount} setCount={setInspirationFlashCount} subtotal={inspirationFlashCost} />
+                <SectionLabel title="持有卡牌內容" />
+                <CounterItem title="中立 / 禁忌卡 (20pt)" val={neutralTaboo} set={setNeutralTaboo} sub={neutralTaboo * 20} />
+                <CounterItem title="普通怪物卡 (20pt)" val={mNormal} set={setMNormal} sub={mNormal * 20} />
+                <CounterItem title="稀有怪物卡 (50pt)" val={mRare} set={setMRare} sub={mRare * 50} />
+                <CounterItem title="傳說怪物卡 (80pt)" val={mLegend} set={setMLegend} sub={mLegend * 80} />
+
+                <SectionLabel title="特殊強化與裝備" />
+                <CounterItem title="神之靈光一閃 (20pt)" val={godFlash} set={setGodFlash} sub={godFlash * 20} />
+                <CounterItem title="裝備效果 (10pt)" val={equipEffect} set={setEquipEffect} sub={equipEffect * 10} />
             </div>
 
-            <div style={{ 
-                padding: '10px', 
-                background: isOverLimit ? '#ffebee' : '#e3f2fd', 
-                borderTop: '1px solid #ddd',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                borderBottomLeftRadius: '8px',
-                borderBottomRightRadius: '8px'
-            }}>
-                <span style={{ fontWeight: 'bold', color: '#333' }}>總計</span>
-                <span style={{ fontSize: '1.5em', fontWeight: 'bold', color: isOverLimit ? '#d32f2f' : '#1565c0' }}>{totalPT}</span>
+            <div style={{ padding: '15px', background: isOver ? '#ffebee' : '#e3f2fd', borderTop: '1px solid #eee', textAlign: 'right', borderBottomLeftRadius: '10px', borderBottomRightRadius: '10px' }}>
+                <div style={{ fontSize: '0.85em', color: '#666' }}>預估存檔總點數</div>
+                <div style={{ fontSize: '1.8em', fontWeight: 'bold', color: isOver ? '#d32f2f' : '#1565c0' }}>{totalPT}</div>
             </div>
         </div>
     );
 };
 
-CharacterColumn.propTypes = {
-    name: PropTypes.string.isRequired,
-    ptLimit: PropTypes.number.isRequired
-};
-
-const SectionTitle = ({ title }) => (
-    <div style={{ padding: '8px 0 5px', borderBottom: '1px solid #eee', marginTop: '5px', color: '#666', fontWeight: 'bold', fontSize: '0.9em' }}>
-        {title}
-    </div>
+const SectionLabel = ({ title }) => (
+    <div style={{ fontSize: '0.75em', color: '#1976d2', fontWeight: 'bold', marginTop: '12px', marginBottom: '6px', borderLeft: '3px solid #1976d2', paddingLeft: '8px' }}>{title}</div>
 );
 
-SectionTitle.propTypes = {
-    title: PropTypes.string.isRequired
-};
-
-const CounterRow = ({ title, count, setCount, subtotal, max, isSubItem }) => (
-    <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '5px 0', 
-        borderBottom: '1px solid #f0f0f0',
-        paddingLeft: isSubItem ? '10px' : '0',
-        fontSize: '0.9em'
-    }}>
-        <div style={{ flex:1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {title}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-            <button onClick={() => setCount(Math.max(0, count - 1))} style={btnStyle}>-</button>
-            <input 
-                type="number" 
-                className="no-spinner"
-                value={count}
-                onChange={(e) => {
-                    let val = parseInt(e.target.value);
-                    if (isNaN(val)) val = 0;
-                    if (val < 0) val = 0;
-                    if (max !== undefined && val > max) val = max;
-                    setCount(val);
-                }}
-                style={{ width: '40px', textAlign: 'center', padding: '2px', borderRadius: '3px', border: '1px solid #ddd', fontSize: '0.9em' }}
-            />
-            <button 
-                onClick={() => {
-                    if (max !== undefined && count >= max) return;
-                    setCount(count + 1);
-                }}
-                style={btnStyle}
-            >
-                +
-            </button>
-        </div>
-        <div style={{ width: '35px', textAlign: 'right', fontWeight: 'bold', color: subtotal > 0 ? '#d32f2f' : '#333', fontSize: '0.9em' }}>
-            {subtotal}
+const CounterItem = ({ title, val, set, sub, max, color }) => (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', fontSize: '0.9em' }}>
+        <div style={{ color: color || '#333', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <button onClick={() => set(Math.max(0, val - 1))} style={btnS}>-</button>
+            <span style={{ width: '25px', textAlign: 'center', fontWeight: '500' }}>{val}</span>
+            <button onClick={() => set(max !== undefined ? Math.min(max, val + 1) : val + 1)} style={btnS}>+</button>
+            <div style={{ width: '40px', textAlign: 'right', fontWeight: 'bold', color: sub > 0 ? '#d32f2f' : '#bbb' }}>{sub > 0 ? sub : (sub === 0 && color ? '-' : '0')}</div>
         </div>
     </div>
 );
 
-CounterRow.propTypes = {
-    title: PropTypes.string.isRequired,
-    count: PropTypes.number.isRequired,
-    setCount: PropTypes.func.isRequired,
-    subtotal: PropTypes.number.isRequired,
-    max: PropTypes.number,
-    isSubItem: PropTypes.bool
+const btnS = { 
+    width: '24px', height: '24px', border: '1px solid #ddd', background: 'white', 
+    borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
 };
 
-const btnStyle = {
-    width: '20px',
-    height: '20px',
-    borderRadius: '3px',
-    border: '1px solid #ccc',
-    background: 'white',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '1em',
-    color: '#555',
-    padding: 0
-};
+CharacterColumn.propTypes = { name: PropTypes.string.isRequired, ptLimit: PropTypes.number.isRequired };
+SectionLabel.propTypes = { title: PropTypes.string.isRequired };
+CounterItem.propTypes = { title: PropTypes.string.isRequired, val: PropTypes.number.isRequired, set: PropTypes.func.isRequired, sub: PropTypes.number.isRequired, max: PropTypes.number, color: PropTypes.string };
 
 export default CounterPage;
