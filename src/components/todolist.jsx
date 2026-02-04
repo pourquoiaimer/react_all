@@ -1,7 +1,14 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const TodoList = () => {
-    const [todo, setTodo] = useState(['123', 'bsd'])
+    const [todo, setTodo] = useState(() => {
+        const savedTodos = localStorage.getItem("todoList");
+        return savedTodos ? JSON.parse(savedTodos) : ['123', 'bsd'];
+    });
+
+    useEffect(() => {
+        localStorage.setItem("todoList", JSON.stringify(todo));
+    }, [todo]);
 
     const todo_now = useRef("")
     function add_todo() {
