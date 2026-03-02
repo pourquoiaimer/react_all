@@ -1,177 +1,156 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import {
   LineChart,
-  CartesianGrid,
+  Line,
   XAxis,
   YAxis,
+  CartesianGrid,
   Tooltip,
   Legend,
-  Line,
 } from "recharts";
-// import { useDispatch } from "react-redux";
-import { setPageTitle } from "../store/headerSlice"; // 引入我們定義的 Action
-// import { AllData } from "../App";
-//嘗試fetch寫
+
 const Weather = () => {
-  const [weatherData, setWeatherData] = useState("");
+  const [weatherData, setWeatherData] = useState(null);
   const [city_list, setCity_list] = useState([]);
   const [now_city, setNow_city] = useState("");
-  const [nowWeatherData, setNowWeatherData] = useState("");
-  const [nowTime, setNowTime] = useState("");
-  // console.log(nowDate.getHours());
-  // const { setNowShow } = useContext(AllData);
-  // useEffect(() => {
-  //   setNowShow("天氣");
-  // }, [setNowShow]);
-  // const dispatch = useDispatch();
-  // useEffect(() => {
-  //   // 2. 發送 Action 來修改 Redux 裡的 title
-  //   // 這裡傳入的 "字數計算" 會變成 action.payload
-  //   dispatch(setPageTitle("天氣"));
+  const [nowWeatherData, setNowWeatherData] = useState(null);
 
-  //   // 組件卸載時(離開這頁)，你可以選擇是否要改回預設標題，或是在 Home 頁面設回來
-  //   return () => dispatch(setPageTitle("綜合頁面"));
-  // }, [dispatch]);
-
-
-  
   useEffect(() => {
     fetch(
-      "https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWA-23ED0872-47D9-4D97-A9BF-A6182904FD12&format=JSON&locationName="
+      "https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWA-23ED0872-47D9-4D97-A9BF-A6182904FD12&format=JSON"
     )
+      .then((response) => response.json())
       .then((response) => {
-        return response.json();
-      })
-      .then((response) => {
-        let temp_list = [];
-
-        response.records.location.map(function (data) {
-          temp_list.push(data.locationName);
-        });
+        const temp_list = response.records.location.map(data => data.locationName);
         setCity_list(temp_list);
         setWeatherData(response.records);
-        let now_time =
-          response.records.location[0].weatherElement[0].time[0].startTime
-            .split(" ")[1]
-            .split(":")[0] == 18
-            ? "今天晚上"
-            : "今天白天";
-        console.log(now_time);
-        setNowTime(now_time);
       })
       .catch((error) => {
         console.log(`Error: ${error}`);
       });
   }, []);
 
-  function WeatherChart() {
-    // console.log(nowWeatherData);
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="custom-tooltip" style={{backgroundColor: '#fff', border: '1px solid #ccc', padding: '10px', borderRadius: '5px'}}>
+          <p className="label"><strong>{`${label}`}</strong></p>
+          <p style={{color: '#ff7300'}}>{`最高溫度 : ${data.最高溫度}°C`}</p>
+          <p style={{color: '#387908'}}>{`最低溫度 : ${data.最低溫度}°C`}</p>
+          <p style={{color: '#8884d8'}}>{`降雨機率 : ${data.降雨機率}%`}</p>
+          <p>{`天氣狀況 : ${data.天氣狀況}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
 
-    const data = [
-      {
-        name: nowTime,
-        天氣: nowWeatherData.weatherElement[0].time[2].parameter.parameterName,
-        最低溫度:
-          nowWeatherData.weatherElement[2].time[0].parameter.parameterName,
-        最高溫度:
-          nowWeatherData.weatherElement[4].time[0].parameter.parameterName,
-      },
-      {
-        name: nowTime == "今天白天" ? "今天晚上" : "明天白天",
-        天氣: nowWeatherData.weatherElement[0].time[2].parameter.parameterName,
-        最低溫度:
-          nowWeatherData.weatherElement[2].time[1].parameter.parameterName,
-        最高溫度:
-          nowWeatherData.weatherElement[4].time[1].parameter.parameterName,
-      },
-      {
-        name: nowTime == "今天白天" ? "明天白天" : "明天晚上",
-        天氣: nowWeatherData.weatherElement[0].time[2].parameter.parameterName,
-        最低溫度:
-          nowWeatherData.weatherElement[2].time[2].parameter.parameterName,
-        最高溫度:
-          nowWeatherData.weatherElement[4].time[2].parameter.parameterName,
-      },
-    ];
+  function WeatherInfo() {
+    if (!nowWeatherData) return null;
+
+    const startTimeHour = new Date(nowWeatherData.weatherElement[0].time[0].startTime).getHours();
+    const timeLabels = startTimeHour < 12
+        ? ['今天白天', '今天晚上', '明天白天']
+        : ['今天晚上', '明天白天', '明天晚上'];
+
+    const chartData = timeLabels.map((label, index) => {
+        if (!nowWeatherData.weatherElement[0].time[index]) return null;
+        return {
+            name: label,
+            天氣狀況: nowWeatherData.weatherElement[0].time[index].parameter.parameterName,
+            降雨機率: parseInt(nowWeatherData.weatherElement[1].time[index].parameter.parameterName, 10),
+            最低溫度: parseInt(nowWeatherData.weatherElement[2].time[index].parameter.parameterName, 10),
+            最高溫度: parseInt(nowWeatherData.weatherElement[4].time[index].parameter.parameterName, 10),
+        };
+    }).filter(Boolean);
+
+    const chartWidth = 900;
+    const chartHeight = 550; // Increased height
+    const cardWidth = 220;
+    const chartMargin = { top: 280, right: 30, left: 20, bottom: 5 }; // Increased top margin
+    const plotAreaWidth = chartWidth - chartMargin.left - chartMargin.right;
 
     return (
-      <LineChart
-        width={900}
-        height={450}
-        data={data}
-        margin={{ top: 25, right: 30, left: 20, bottom: 20 }}
-      >
-        <CartesianGrid strokeDasharray="3" vertical={false} />
-        <XAxis dataKey="name" padding={{ left: 50, right: 50 }} />
-        <YAxis height={510} />
-        <Tooltip />
-        <Legend padding={{ top: 50 }} />
-        <Line type="monotone" dataKey="最高溫度" stroke="#8884d8" />
-        <Line type="monotone" dataKey="最低溫度" stroke="#82ca9d" />
-        <Line type="monotone" dataKey="天氣" stroke="red" />
-      </LineChart>
+        <div style={{ position: 'relative', width: chartWidth, margin: '20px auto' }}>
+            {/* Info Cards Overlay */}
+            <div style={{
+                position: 'absolute',
+                top: '20px',
+                left: chartMargin.left,
+                width: plotAreaWidth,
+                display: 'flex',
+                justifyContent: 'space-between',
+                zIndex: 10
+            }}>
+                {chartData.map((period, index) => (
+                    <div key={index} style={{
+                        border: '1px solid #ddd',
+                        padding: '10px 15px',
+                        borderRadius: '8px',
+                        width: cardWidth,
+                        backgroundColor: 'rgba(249, 249, 249, 0.85)',
+                        backdropFilter: 'blur(5px)',
+                        textAlign: 'center',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                    }}>
+                        <h4>{period.name}</h4>
+                        <p style={{fontSize: '1.2em', fontWeight: 'bold', margin: '5px 0'}}>{period.天氣狀況}</p>
+                        <p style={{margin: '5px 0'}}>溫度: {period.最低溫度}°C - {period.最高溫度}°C</p>
+                    </div>
+                ))}
+            </div>
+
+            <LineChart
+                width={chartWidth}
+                height={chartHeight}
+                data={chartData}
+                margin={chartMargin}
+            >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={false} />
+                <YAxis label={{ value: '溫度 (°C)', angle: -90, position: 'insideLeft' }}/>
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ top: 240, left: 25 }} /> {/* Adjusted legend position */}
+                <Line type="monotone" dataKey="最高溫度" stroke="#ff7300" strokeWidth={2} name="最高溫度" />
+                <Line type="monotone" dataKey="最低溫度" stroke="#387908" strokeWidth={2} name="最低溫度" />
+            </LineChart>
+        </div>
     );
   }
 
   function change_city(e) {
-    let city = e.target.value;
-    let nowWeatherData;
-    weatherData.location.map(function (data) {
-      if (data.locationName == city) {
-        nowWeatherData = data;
-      }
-    });
-
+    const city = e.target.value;
+    const cityData = weatherData.location.find(data => data.locationName === city);
     setNow_city(city);
-    setNowWeatherData(nowWeatherData);
+    setNowWeatherData(cityData);
   }
 
   return (
     <>
-      {weatherData != "" ? (
-        <>
-          {city_list.length != 0 && (
-            <div>
-              {/* <div>{city_list}</div> */}
-              <select
-                name=""
-                id="city_list"
-                onChange={(e) => {
-                  change_city(e);
-                }}
-              >
-                <option value="none" selected disabled hidden>
-                  請選擇城市
-                </option>
-                {city_list.map(function (data, index) {
-                  return (
-                    <option value={data} key={index}>
-                      {data}
-                    </option>
-                  );
-                })}
-              </select>
-
-              <div style={{ margin: "auto 0", padding: "30px" }}>
-                {weatherData.location.map(function (data) {
-                  if (data.locationName == now_city) {
-                    return (
-                      <>
-                        <WeatherChart />
-                      </>
-                    );
-                  } else {
-                    return null;
-                  }
-                })}
-              </div>
-            </div>
-          )}
-        </>
+      {weatherData ? (
+        <div style={{padding: '20px'}}>
+          <select
+            name="city_list"
+            id="city_list"
+            onChange={change_city}
+            defaultValue="none"
+            style={{marginBottom: '20px', padding: '5px'}}
+          >
+            <option value="none" disabled hidden>
+              請選擇城市
+            </option>
+            {city_list.map((data, index) => (
+              <option value={data} key={index}>
+                {data}
+              </option>
+            ))}
+          </select>
+          
+          {nowWeatherData ? <WeatherInfo /> : <div style={{textAlign: 'center', marginTop: '20px'}}>請選擇一個城市來查看天氣資訊</div>}
+        </div>
       ) : (
-        <>
-          <div>沒抓到</div>
-        </>
+        <div style={{textAlign: 'center', marginTop: '50px'}}>天氣資料載入中...</div>
       )}
     </>
   );
