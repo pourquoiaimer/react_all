@@ -12,7 +12,7 @@ const CounterPage = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <label style={{ fontWeight: 'bold' }}>PT 等級 (1-16):</label>
                     <input 
-                        type="number" min="1" max="15" 
+                        type="number" min="1" max="16" 
                         value={ptLevel} 
                         onChange={(e) => setPtLevel(Math.min(16, Math.max(1, parseInt(e.target.value) || 1)))}
                         style={{ width: '55px', padding: '5px', borderRadius: '4px', border: 'none', textAlign: 'center' }}

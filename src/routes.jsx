@@ -49,8 +49,8 @@ export const pageRoutes = [
   },
   {
     path: '/counter_page',
-    name: '卡厄斯pt計算',
-    title: '卡厄斯pt計算',
+    name: '卡厄思pt計算',
+    title: '卡厄思pt計算',
     element: <CounterPage />,
   },
   {
