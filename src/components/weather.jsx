@@ -12,7 +12,7 @@ import {
 const Weather = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [city_list, setCity_list] = useState([]);
-  const [now_city, setNow_city] = useState("");
+  const [now_city, setNow_city] = useState("新北市");
   const [nowWeatherData, setNowWeatherData] = useState(null);
 
   useEffect(() => {
@@ -21,9 +21,16 @@ const Weather = () => {
     )
       .then((response) => response.json())
       .then((response) => {
-        const temp_list = response.records.location.map(data => data.locationName);
+        const locations = response.records.location;
+        const temp_list = locations.map(data => data.locationName);
         setCity_list(temp_list);
         setWeatherData(response.records);
+
+        // Find and set the default city's data
+        const defaultCityData = locations.find(loc => loc.locationName === "新北市");
+        if (defaultCityData) {
+          setNowWeatherData(defaultCityData);
+        }
       })
       .catch((error) => {
         console.log(`Error: ${error}`);
@@ -134,12 +141,9 @@ const Weather = () => {
             name="city_list"
             id="city_list"
             onChange={change_city}
-            defaultValue="none"
+            value={now_city}
             style={{marginBottom: '20px', padding: '5px'}}
           >
-            <option value="none" disabled hidden>
-              請選擇城市
-            </option>
             {city_list.map((data, index) => (
               <option value={data} key={index}>
                 {data}
@@ -147,7 +151,7 @@ const Weather = () => {
             ))}
           </select>
           
-          {nowWeatherData ? <WeatherInfo /> : <div style={{textAlign: 'center', marginTop: '20px'}}>請選擇一個城市來查看天氣資訊</div>}
+          {nowWeatherData ? <WeatherInfo /> : <div style={{textAlign: 'center', marginTop: '20px'}}>正在載入預設城市天氣...</div>}
         </div>
       ) : (
         <div style={{textAlign: 'center', marginTop: '50px'}}>天氣資料載入中...</div>

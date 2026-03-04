@@ -13,8 +13,8 @@ import LineStickerCropper from './components/LineStickerCropper.jsx';
 export const pageRoutes = [
   {
     path: '/count_text',
-    name: '字數計算',
-    title: '字數計算',
+    name: '字數計算和繁簡轉換',
+    title: '字數計算和繁簡轉換',
     element: <Count_text />,
   },
   {
