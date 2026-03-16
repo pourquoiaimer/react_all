@@ -6,7 +6,7 @@ const RIOT_API_KEY = '0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z';
 const API_URL = 'https://esports-api.lolesports.com/persisted/gw/getSchedule?hl=zh-TW';
 
 // Define leagues
-const INTERNATIONAL_LEAGUES = ['MSI', 'Worlds'];
+const INTERNATIONAL_LEAGUES = ['MSI', 'Worlds', 'First Stand'];
 const REGIONAL_LEAGUES = ['LCK', 'LPL', 'LCP'];
 const ALL_FETCH_LEAGUES = [...INTERNATIONAL_LEAGUES, ...REGIONAL_LEAGUES];
 
@@ -17,10 +17,17 @@ const DEFAULT_LOL_ICON = 'https://upload.wikimedia.org/wikipedia/commons/thumb/d
 
 // --- Reusable Child Component for Robust Image Handling ---
 const TeamImage = ({ src, alt, style }) => {
-    const [imgSrc, setImgSrc] = useState(src);
+    const getSecureUrl = (url) => {
+        if (typeof url === 'string') {
+            return url.replace('http://', 'https://');
+        }
+        return url;
+    }
+
+    const [imgSrc, setImgSrc] = useState(getSecureUrl(src));
 
     useEffect(() => {
-        setImgSrc(src);
+        setImgSrc(getSecureUrl(src));
     }, [src]);
 
     const handleError = () => {
