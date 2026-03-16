@@ -4,20 +4,26 @@ import React, { useState, useEffect, useMemo } from 'react';
 // --- Constants ---
 const RIOT_API_KEY = '0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z';
 const API_URL = 'https://esports-api.lolesports.com/persisted/gw/getSchedule?hl=zh-TW';
-const TARGET_LEAGUES = ['LCK', 'LPL', 'LCP'];
+
+// Define leagues
+const INTERNATIONAL_LEAGUES = ['MSI', 'Worlds'];
+const REGIONAL_LEAGUES = ['LCK', 'LPL', 'LCP'];
+const ALL_FETCH_LEAGUES = [...INTERNATIONAL_LEAGUES, ...REGIONAL_LEAGUES];
+
+// Define the order of options in the selector
+const SELECTOR_OPTIONS = ['All', 'International', ...REGIONAL_LEAGUES];
+
 const DEFAULT_LOL_ICON = 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/League_of_Legends_2019_vector.svg/1200px-League_of_Legends_2019_vector.svg.png';
 
 // --- Reusable Child Component for Robust Image Handling ---
-// This component internally handles image loading errors.
 const TeamImage = ({ src, alt, style }) => {
     const [imgSrc, setImgSrc] = useState(src);
 
     useEffect(() => {
-        setImgSrc(src); // Reset src if the parent component provides a new one
+        setImgSrc(src);
     }, [src]);
 
     const handleError = () => {
-        // If the image fails to load, set it to the default LoL icon.
         setImgSrc(DEFAULT_LOL_ICON);
     };
 
@@ -45,13 +51,13 @@ const LolMatches = () => {
                 const events = json.data?.schedule?.events || [];
 
                 const now = new Date();
-                now.setHours(0, 0, 0, 0); // Set to the beginning of today
+                now.setHours(0, 0, 0, 0);
 
-                // Filter for future matches from target leagues
+                // Filter for future matches from all relevant leagues
                 const filtered = events.filter(event => {
                     const matchTime = new Date(event.startTime);
                     return event.type === 'match' && 
-                           TARGET_LEAGUES.includes(event.league.name) && 
+                           ALL_FETCH_LEAGUES.includes(event.league.name) && 
                            matchTime >= now;
                 });
                 
@@ -68,10 +74,16 @@ const LolMatches = () => {
 
     // --- Memoized Computations for Performance ---
     const displayMatches = useMemo(() => {
-        if (selectedLeague === 'All') {
-            return allMatches;
+        switch (selectedLeague) {
+            case 'All':
+                // Show all regional leagues, as per original "All" behavior
+                return allMatches.filter(event => REGIONAL_LEAGUES.includes(event.league.name));
+            case 'International':
+                return allMatches.filter(event => INTERNATIONAL_LEAGUES.includes(event.league.name));
+            default:
+                // Handles specific regional leagues like 'LCK', 'LPL', etc.
+                return allMatches.filter(event => event.league.name === selectedLeague);
         }
-        return allMatches.filter(event => event.league.name === selectedLeague);
     }, [allMatches, selectedLeague]);
 
     // --- Render Logic ---
@@ -85,10 +97,17 @@ const LolMatches = () => {
             <div style={styles.controlsContainer}>
                 {/* League Selector */}
                 <select value={selectedLeague} onChange={(e) => setSelectedLeague(e.target.value)} style={styles.select}>
-                    <option value="All">所有主要賽區</option>
-                    {TARGET_LEAGUES.map(league => (
-                        <option key={league} value={league}>{league}</option>
-                    ))}
+                    {SELECTOR_OPTIONS.map(league => {
+                        let optionText;
+                        if (league === 'All') {
+                            optionText = '所有主要賽區';
+                        } else if (league === 'International') {
+                            optionText = '國際賽事';
+                        } else {
+                            optionText = league;
+                        }
+                        return <option key={league} value={league}>{optionText}</option>
+                    })}
                 </select>
             </div>
 
