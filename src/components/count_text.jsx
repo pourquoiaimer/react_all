@@ -30,7 +30,7 @@ const Count_text = () => {
 
   const handleT2S = async () => {
     const converter = await Converter({
-把      from: "tw",
+      from: "tw",
       to: "cn",
     });
     const newText = converter(text);
