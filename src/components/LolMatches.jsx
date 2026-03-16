@@ -83,8 +83,8 @@ const LolMatches = () => {
     const displayMatches = useMemo(() => {
         switch (selectedLeague) {
             case 'All':
-                // Show all regional leagues, as per original "All" behavior
-                return allMatches.filter(event => REGIONAL_LEAGUES.includes(event.league.name));
+                // Show all fetched leagues (International + Regional)
+                return allMatches;
             case 'International':
                 return allMatches.filter(event => INTERNATIONAL_LEAGUES.includes(event.league.name));
             default:
