@@ -11,6 +11,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@imgly/background-removal": "^1.7.0",
     "@reduxjs/toolkit": "^2.11.2",
     "jszip": "^3.10.1",
     "opencc-js": "^1.0.5",
