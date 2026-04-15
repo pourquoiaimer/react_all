@@ -9,6 +9,7 @@ import Leetcode from './components/leetcode_page.jsx';
 import CounterPage from './components/CounterPage.jsx';
 import LolMatches from './components/LolMatches.jsx';
 import LineStickerCropper from './components/LineStickerCropper.jsx';
+import IdPhotoCropper from './components/IdPhotoCropper.jsx';
 
 export const pageRoutes = [
   {
@@ -64,6 +65,12 @@ export const pageRoutes = [
     name: 'LINE貼圖切割',
     title: 'LINE貼圖切割',
     element: <LineStickerCropper />,
+  },
+  {
+    path: '/id-photo-cropper',
+    name: '證件照片剪裁',
+    title: '證件照片剪裁',
+    element: <IdPhotoCropper />,
   },
   {
     path: '/',
