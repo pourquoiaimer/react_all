@@ -10,8 +10,15 @@ import CounterPage from './components/CounterPage.jsx';
 import LolMatches from './components/LolMatches.jsx';
 import LineStickerCropper from './components/LineStickerCropper.jsx';
 import IdPhotoCropper from './components/IdPhotoCropper.jsx';
+import ExchangeRate from './components/ExchangeRate.jsx';
 
 export const pageRoutes = [
+  {
+    path: '/exchange_rate',
+    name: '匯率計算',
+    title: '匯率計算',
+    element: <ExchangeRate />,
+  },
   {
     path: '/count_text',
     name: '字數計算和繁簡轉換',
