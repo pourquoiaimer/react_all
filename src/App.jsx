@@ -1,4 +1,3 @@
-
 import { useSelector, useDispatch } from 'react-redux';
 import './all.scss';
 import {
@@ -10,6 +9,7 @@ import {
 import { useEffect } from 'react';
 import { setPageTitle } from './store/headerSlice';
 import { pageRoutes } from './routes';
+import Clock from './components/Clock';
 
 function App() {
   const nowShow = useSelector((state) => state.header.title);
@@ -25,7 +25,8 @@ function App() {
 
   return (
     <>
-      <header>
+      <header style={{ position: 'relative', textAlign: 'center' }}>
+        <Clock />
         <h1>{nowShow}</h1>
       </header>
 
