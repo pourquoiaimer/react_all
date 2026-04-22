@@ -8,8 +8,25 @@ const Calculator = () => {
     const handleButtonClick = (value) => {
         if (value === '=') {
             try {
+                let expression = input;
+                if (expression.includes('%')) {
+                    const parts = expression.split(/([+\-*\/])/);
+                    const lastPart = parts[parts.length - 1];
+                    if (lastPart.includes('%')) {
+                        const number = parseFloat(lastPart.replace('%', ''));
+                        if (!isNaN(number)) {
+                            const prevNumber = eval(parts.slice(0, -2).join(''));
+                            const operator = parts[parts.length - 2];
+                            if (operator === '+' || operator === '-') {
+                                expression = `${prevNumber} ${operator} ${prevNumber * (number / 100)}`;
+                            } else if (operator === '*') {
+                                expression = `${prevNumber} * (${number / 100})`;
+                            }
+                        }
+                    }
+                }
                 // eslint-disable-next-line no-eval
-                setResult(eval(input));
+                setResult(eval(expression));
             } catch (error) {
                 setResult('Error');
             }
@@ -18,16 +35,13 @@ const Calculator = () => {
             setResult('');
         } else if (value === 'CE') {
             setInput(input.slice(0, -1));
-        }
-        else if (value === '%') {
-            try {
-                // eslint-disable-next-line no-eval
-                setResult(eval(input) / 100);
-            } catch (error) {
-                setResult('Error');
+        } else if (value === '%') {
+            if (input === '') {
+                setInput('0%');
+            } else {
+                setInput(input + '%');
             }
-        }
-        else {
+        } else {
             setInput(input + value);
         }
     };

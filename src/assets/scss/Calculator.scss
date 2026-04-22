@@ -14,11 +14,21 @@
             font-size: 1.2em;
             margin-bottom: 5px;
             color: #888;
+            height: 22px;
+            line-height: 22px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .result {
             font-size: 1.5em;
             font-weight: bold;
+            height: 27px;
+            line-height: 27px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 
