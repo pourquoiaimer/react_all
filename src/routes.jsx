@@ -11,8 +11,15 @@ import LolMatches from './components/LolMatches.jsx';
 import LineStickerCropper from './components/LineStickerCropper.jsx';
 import IdPhotoCropper from './components/IdPhotoCropper.jsx';
 import ExchangeRate from './components/ExchangeRate.jsx';
+import Calculator from './components/Calculator.jsx';
 
 export const pageRoutes = [
+  {
+    path: '/calculator',
+    name: '計算器',
+    title: '計算器',
+    element: <Calculator />,
+  },
   {
     path: '/exchange_rate',
     name: '匯率計算',
