@@ -13,8 +13,10 @@
   "dependencies": {
     "@imgly/background-removal": "^1.7.0",
     "@reduxjs/toolkit": "^2.11.2",
+    "browser-image-compression": "^2.0.2",
     "jszip": "^3.10.1",
     "opencc-js": "^1.0.5",
+    "pdf-lib": "^1.17.1",
     "react": "^18.2.0",
     "react-cropper": "^2.3.3",
     "react-dom": "^18.2.0",
