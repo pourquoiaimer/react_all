@@ -13,12 +13,9 @@
   "dependencies": {
     "@imgly/background-removal": "^1.7.0",
     "@reduxjs/toolkit": "^2.11.2",
-<<<<<<< HEAD
+    "browser-image-compression": "^2.0.2",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
-=======
-    "browser-image-compression": "^2.0.2",
->>>>>>> e21e35b62ce0b3297a561895d32e97d60caad26a
     "jszip": "^3.10.1",
     "opencc-js": "^1.0.5",
     "pdf-lib": "^1.17.1",

@@ -124,7 +124,8 @@ const BingoGenerator = () => {
                     }
 
                     const canvas = await html2canvas(cardElement, {
-                        scale: 1,
+                        // 提高截圖縮放比例 (scale) 來提升解析度，通常設為 3 或 4 可以達到印刷級別的清晰度 (300 DPI 左右)
+                        scale: 3,
                         useCORS: true,
                         backgroundColor: '#ffffff',
                     });
