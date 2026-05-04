@@ -8,12 +8,18 @@ import Color_game from './components/color_game.jsx';
 import Leetcode from './components/leetcode_page.jsx';
 import CounterPage from './components/CounterPage.jsx';
 import LolMatches from './components/LolMatches.jsx';
-import LineStickerCropper from './components/LineStickerCropper.jsx';
-import IdPhotoCropper from './components/IdPhotoCropper.jsx';
+import DocumentImageTools from './components/IdPhotoCropper.jsx'; // Updated import
 import ExchangeRate from './components/ExchangeRate.jsx';
 import Calculator from './components/Calculator.jsx';
+import BingoGenerator from './components/BingoGenerator.jsx';
 
 export const pageRoutes = [
+  {
+    path: '/bingo',
+    name: 'Bingo產生器',
+    title: 'Bingo產生器',
+    element: <BingoGenerator />,
+  },
   {
     path: '/calculator',
     name: '計算器',
@@ -75,16 +81,10 @@ export const pageRoutes = [
     element: <LolMatches />,
   },
   {
-    path: '/line_sticker_cropper',
-    name: 'LINE貼圖切割',
-    title: 'LINE貼圖切割',
-    element: <LineStickerCropper />,
-  },
-  {
-    path: '/id-photo-cropper',
-    name: '證件照片剪裁',
-    title: '證件照片剪裁',
-    element: <IdPhotoCropper />,
+    path: '/document-image-tools', // Updated path
+    name: '文件圖片處理工具', // Updated name
+    title: '文件圖片處理工具', // Updated title
+    element: <DocumentImageTools />,
   },
   {
     path: '/',
