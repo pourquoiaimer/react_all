@@ -12,31 +12,20 @@ import DocumentImageTools from './components/IdPhotoCropper.jsx'; // Updated imp
 import ExchangeRate from './components/ExchangeRate.jsx';
 import Calculator from './components/Calculator.jsx';
 import BingoGenerator from './components/BingoGenerator.jsx';
+import SudokuGame from './components/SudokuGame.jsx';
 
 export const pageRoutes = [
   {
-    path: '/bingo',
-    name: 'Bingo產生器',
-    title: 'Bingo產生器',
-    element: <BingoGenerator />,
-  },
-  {
-    path: '/calculator',
-    name: '計算器',
-    title: '計算器',
-    element: <Calculator />,
+    path: '/count_text',
+    name: '字數計算和繁簡轉換',
+    title: '字數計算和繁簡轉換',
+    element: <Count_text />,
   },
   {
     path: '/exchange_rate',
     name: '匯率計算',
     title: '匯率計算',
     element: <ExchangeRate />,
-  },
-  {
-    path: '/count_text',
-    name: '字數計算和繁簡轉換',
-    title: '字數計算和繁簡轉換',
-    element: <Count_text />,
   },
   {
     path: '/weather',
@@ -49,6 +38,24 @@ export const pageRoutes = [
     name: '待辦清單',
     title: '待辦事項',
     element: <TodoList />,
+  },
+  {
+    path: '/bingo',
+    name: 'Bingo產生器',
+    title: 'Bingo產生器',
+    element: <BingoGenerator />,
+  },
+  {
+    path: '/sudoku',
+    name: '數獨遊戲',
+    title: '數獨遊戲',
+    element: <SudokuGame />,
+  },
+  {
+    path: '/calculator',
+    name: '計算器',
+    title: '計算器',
+    element: <Calculator />,
   },
   {
     path: '/tic_tac_toe',
