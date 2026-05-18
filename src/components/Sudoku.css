@@ -1,147 +1,60 @@
-/* --- Main Container --- */
-.sudoku-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: sans-serif;
-}
+/* --- Main Container & Areas --- */
+.sudoku-container { display: flex; flex-direction: column; align-items: center; font-family: sans-serif; }
+.sudoku-main-area { display: flex; flex-direction: column; align-items: center; margin-top: 20px; width: 100%; }
 
 /* --- Controls & Info --- */
-.sudoku-controls {
-  margin: 15px 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  align-items: center;
-  justify-content: center;
+.sudoku-controls { margin: 15px 0; display: flex; flex-wrap: wrap; gap: 25px; align-items: center; justify-content: center; }
+.info-group { display: flex; gap: 15px; align-items: center; background-color: #f8f9fa; padding: 8px 15px; border-radius: 5px; border: 1px solid #dee2e6; }
+.info-group span { font-size: 16px; color: #495057; }
+.sudoku-controls button, .sudoku-controls select { padding: 8px 12px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; cursor: pointer; }
+.sudoku-controls button.active { background-color: #007bff; color: white; border-color: #007bff; }
+.sudoku-controls > span { font-size: 18px; font-weight: bold; }
+
+/* --- General Button Disabled State --- */
+button:disabled {
+    background-color: #e9ecef; /* Light grey background */
+    color: #6c757d;           /* Muted text color */
+    cursor: not-allowed;       /* Indicate non-interactive */
+    border-color: #ced4da;
 }
 
-.info-group {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    background-color: #f8f9fa;
-    padding: 8px 15px;
-    border-radius: 5px;
-    border: 1px solid #dee2e6;
-}
-
-.info-group span {
-    font-size: 16px;
-    color: #495057;
-}
-
-.sudoku-controls button, 
-.sudoku-controls select {
-    padding: 8px 12px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.sudoku-controls button.active {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
-}
-
-.sudoku-controls > span {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.completion-message {
-    color: green;
-    font-size: 24px;
-    font-weight: bold;
-    margin-top: 10px;
-}
+/* --- Messages & Prompts --- */
+.start-prompt { margin-top: 20px; font-size: 18px; color: #6c757d; }
 
 /* --- Modal Styles --- */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.55); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background: white; padding: 25px 35px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 20px; min-width: 300px; }
+.modal-content h2 { margin: 0; text-align: center; }
+.control-group { display: flex; justify-content: space-between; align-items: center; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+.modal-actions button.confirm { background-color: #28a745; color: white; border-color: #28a745; }
+.completion-details { display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 1.1em; margin: 10px 0; }
+.completion-details span { background-color: #f1f3f5; padding: 5px 10px; border-radius: 5px; }
 
-.modal-content {
-    background: white;
-    padding: 25px 35px;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.modal-content h2 {
-    margin: 0;
-    text-align: center;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.modal-actions button.confirm {
-    background-color: #28a745; /* Green */
-    color: white;
-    border-color: #28a745;
-}
-
-/* --- Sudoku Board --- */
-.sudoku-board {
-  display: grid;
-  border: 3px solid black;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  background-color: #fff; 
-}
-
-.sudoku-board.size-9 { grid-template-columns: repeat(9, 1fr); grid-template-rows: repeat(9, 1fr); width: 540px; height: 540px; }
-.sudoku-board.size-4 { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); width: 320px; height: 320px; }
-
-/* --- Sudoku Cell --- */
-.sudoku-cell {
-  position: relative; 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid #ccc;
-  font-size: 2em;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-}
-
-.size-4 .sudoku-cell { font-size: 3em; }
-
-/* Cell States */
+/* --- Sudoku Board & Cells --- */
+.sudoku-board { display: grid; border: 3px solid black; box-shadow: 0 4px 8px rgba(0,0,0,0.2); background-color: #fff; }
+.sudoku-board.size-9 { grid-template-columns: repeat(9, 1fr); grid-template-rows: repeat(9, 1fr); width: min(90vw, 540px); height: min(90vw, 540px); }
+.sudoku-board.size-4 { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); width: min(80vw, 320px); height: min(80vw, 320px); }
+.sudoku-cell { position: relative; display: flex; justify-content: center; align-items: center; border: 1px solid #ccc; font-size: clamp(1.5em, 5vw, 2em); cursor: pointer; transition: background-color 0.2s ease-in-out; }
 .sudoku-cell.given { font-weight: bold; color: #333; background-color: #e9ecef; }
-.sudoku-cell.selected { background-color: #a7d8fd !important; }
-.sudoku-cell.highlighted { background-color: #f0f8ff; }
-.sudoku-cell.error { background-color: #f8d7da; color: #721c24; }
-
-/* Block Borders */
-.sudoku-board.size-9 .sudoku-cell[data-row='2'],
-.sudoku-board.size-9 .sudoku-cell[data-row='5'] { border-bottom: 2px solid black; }
-.sudoku-board.size-9 .sudoku-cell[data-col='2'],
-.sudoku-board.size-9 .sudoku-cell[data-col='5'] { border-right: 2px solid black; }
+.sudoku-cell.error { color: #dc3545; font-weight: bold; }
+.sudoku-cell.cross-highlight { background-color: #e7f5ff; }
+.sudoku-cell.number-highlight { background-color: #fff9c4; }
+.sudoku-cell.selected { background-color: #bde0fe !important; }
+.sudoku-board.size-9 .sudoku-cell[data-row='2'], .sudoku-board.size-9 .sudoku-cell[data-row='5'] { border-bottom: 2px solid black; }
+.sudoku-board.size-9 .sudoku-cell[data-col='2'], .sudoku-board.size-9 .sudoku-cell[data-col='5'] { border-right: 2px solid black; }
 .sudoku-board.size-4 .sudoku-cell[data-row='1'] { border-bottom: 2px solid black; }
 .sudoku-board.size-4 .sudoku-cell[data-col='1'] { border-right: 2px solid black; }
-
-/* Note Styles */
 .sudoku-notes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; }
 .size-9 .sudoku-notes { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
 .size-4 .sudoku-notes { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
 .sudoku-note { display: flex; justify-content: center; align-items: center; font-size: 0.8rem; color: #6c757d; }
 
+/* --- Numpad Styles --- */
+.numpad-container { display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 20px; }
+.numpad-row { display: flex; flex-wrap: nowrap; justify-content: center; gap: 10px; margin-bottom: 10px; }
+.numpad-row button { flex: 1 0 auto; min-width: 50px; padding: 15px 0; font-size: 1.5em; font-weight: bold; border-radius: 5px; border: 1px solid #ccc; background-color: #fff; cursor: pointer; transition: background-color 0.2s; }
+.numpad-row button:hover { background-color: #f0f0f0; }
+.numpad-actions { display: flex; justify-content: center; width: 100%; }
+.delete-btn { width: 120px; padding: 10px; font-size: 1.2em; color: #dc3545; font-weight: bold; border-radius: 5px; border: 1px solid #ccc; background-color: #fff; cursor: pointer; transition: background-color 0.2s; }
+.delete-btn:hover { background-color: #f8d7da; }
